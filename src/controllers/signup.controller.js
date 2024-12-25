@@ -1,3 +1,6 @@
+import jwt from 'jsonwebtoken'
+
+
 export const signUpUser=(req, res) =>{
     
         //     points to remember
@@ -14,8 +17,14 @@ export const signUpUser=(req, res) =>{
                 res.status(400).send({message:'Password and confirm password do not match'});
                 return;
             }
+            if(!email.includes('@') || !email.includes('.')){
+                res.status(400).send({message:'Invalid email format'});
+                return;
+            }
         
-            const user = {name,email,password,confirmPassword};
+            const hashedPassword = jwt.sign({password}, 'secret-key');
+            const hashedConfirmPassword = jwt.sign({confirmPassword}, 'secret-key');
+            const user = {name, email, password: hashedPassword, confirmPassword: hashedConfirmPassword};
         
             if(user){
                 res.status(201).send({data:user,message:"User created successfully"});
